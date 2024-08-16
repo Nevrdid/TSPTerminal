@@ -21,17 +21,18 @@ Todo:
 --------------------
 
 Keys: 
-- pad: select key
+- X: show / hide keyboard
+- Y: change keyboard location (top/bottom)
+- pad:
+    - With keyboard: select key
+    - Without keyboard: arrow keys
+- left stick: arrow keys
 - A: press key
 - B: is backspace
 - L1: is shift
 - R1: toggles key (useful for shift/ctrl...)
-- L1: move cursor left
-- R1: move cursor right
-- Y: change keyboard location (top/bottom)
-- X: show / hide keyboard
 - Start: Enter
-- Select: 
+- Select: Tab
 - MENU: quit
 
 Build

@@ -432,7 +432,7 @@ void upscale4x3(uint16_t *restrict src, uint32_t *restrict dst) {
 }
 void xflip(void) {
     if (xw.win == NULL) return;
-        // printf("flip\n");
+    // printf("flip\n");
     memcpy(screen2->pixels, xw.win->pixels, 320 * 240 * 2);  // copy for keyboardMix
     draw_keyboard(screen2);                                  // screen2(SW) = console + keyboard
     upscale4x3(screen2->pixels, screen->pixels);
@@ -555,7 +555,6 @@ int utf8size(char *s) {
     }
 }
 
-
 static int x2col(int x) {
     x -= borderpx;
     x /= xw.cw;
@@ -654,7 +653,8 @@ void selcopy(void) {
             gp   = &term.line[y][0];
             last = gp + term.col;
 
-            while (--last >= gp && !(last->state & GLYPH_SET)) /* nothing */;
+            while (--last >= gp && !(last->state & GLYPH_SET)) /* nothing */
+                ;
 
             for (x = 0; gp <= last; x++, ++gp) {
                 if (!(is_selected = selected(x, y))) continue;
@@ -1537,10 +1537,12 @@ void tputtab(bool forward) {
 
     if (forward) {
         if (x == term.col) return;
-        for (++x; x < term.col && !term.tabs[x]; ++x) /* nothing */;
+        for (++x; x < term.col && !term.tabs[x]; ++x) /* nothing */
+            ;
     } else {
         if (x == 0) return;
-        for (--x; x > 0 && !term.tabs[x]; --x) /* nothing */;
+        for (--x; x > 0 && !term.tabs[x]; --x) /* nothing */
+            ;
     }
     tmoveto(x, term.c.y);
 }
@@ -1592,8 +1594,7 @@ void tputc(char *c, int len) {
                 /* go to first col if the mode is set */
                 tnewline(IS_SET(MODE_CRLF));
                 return;
-            case '\a': /* BEL */
-                return;
+            case '\a': /* BEL */ return;
             case '\033': /* ESC */
                 csireset();
                 term.esc = ESC_START;
@@ -1785,7 +1786,8 @@ int tresize(int col, int row) {
         bp = term.tabs + term.col;
 
         memset(bp, 0, sizeof(*term.tabs) * (col - term.col));
-        while (--bp > term.tabs && !*bp) /* nothing */;
+        while (--bp > term.tabs && !*bp) /* nothing */
+            ;
         for (bp += tabspaces; bp < term.tabs + col; bp += tabspaces) *bp = 1;
     }
     /* update terminal size */
@@ -1854,35 +1856,8 @@ void sdlloadfonts(char *fontstr, int fontsize) {
     usedfont     = fontstr;
     usedfontsize = fontsize;
 
-    /* XXX: Strongly assumes the original setting had a : in it! */
-    /*if((bfontstr = strchr(fontstr, ':'))) {
-            *bfontstr = '\0';
-            bfontstr++;
-    } else {
-            bfontstr = strchr(fontstr, '\0');
-            bfontstr++;
-    }*/
-
-    /*if(dc.font) TTF_CloseFont(dc.font);
-    dc.font = TTF_OpenFont(fontstr, fontsize);
-fprintf(stderr, "%s\n", fontstr);*/
-    // TTF_SizeUTF8(dc.font, "O", &xw.cw, &xw.ch);
     xw.cw = 6;
     xw.ch = 8;
-
-    /*if(dc.ifont) TTF_CloseFont(dc.ifont);
-    dc.ifont = TTF_OpenFont(fontstr, fontsize);
-fprintf(stderr, "%s\n", fontstr);
-    TTF_SetFontStyle(dc.ifont, TTF_STYLE_ITALIC);
-
-    if(dc.bfont) TTF_CloseFont(dc.bfont);
-    dc.bfont = TTF_OpenFont(bfontstr, fontsize);
-fprintf(stderr, "%s\n", bfontstr);
-
-    if(dc.ibfont) TTF_CloseFont(dc.ibfont);
-    dc.ibfont = TTF_OpenFont(bfontstr, fontsize);
-fprintf(stderr, "%s\n", bfontstr);
-    TTF_SetFontStyle(dc.ibfont, TTF_STYLE_ITALIC);*/
 }
 
 void xzoom(const Arg *arg) {
@@ -1937,23 +1912,6 @@ void sdlinit(void) {
     fprintf(stderr, "SDL font\n");
     /* colors */
     initcolormap();
-
-    //	/* adjust fixed window geometry */
-    //	if(xw.isfixed) {
-    //		if(xw.fx < 0)
-    //			xw.fx = vi->current_w + xw.fx - xw.fw - 1;
-    //		if(xw.fy < 0)
-    //			xw.fy = vi->current_h + xw.fy - xw.fh - 1;
-    //
-    //		xw.h = xw.fh;
-    //		xw.w = xw.fw;
-    //	} else {
-    //		/* window - default size */
-    //		xw.h = 2*borderpx + term.row * xw.ch;
-    //		xw.w = 2*borderpx + term.col * xw.cw;
-    //		xw.fx = 0;
-    //		xw.fy = 0;
-    //	}
 
     xw.w = initial_width;
     xw.h = initial_height;
@@ -2023,11 +1981,6 @@ void xdraws(char *s, Glyph base, int x, int y, int charlen, int bytelen) {
         // font = dc.bfont;
     }
 
-    /*if(base.mode & ATTR_ITALIC)
-            font = dc.ifont;
-    if((base.mode & ATTR_ITALIC) && (base.mode & ATTR_BOLD))
-            font = dc.ibfont;*/
-
     if (IS_SET(MODE_REVERSE)) {
         if (fg == &dc.colors[defaultfg]) {
             fg = &dc.colors[defaultbg];
@@ -2067,28 +2020,10 @@ void xdraws(char *s, Glyph base, int x, int y, int charlen, int bytelen) {
 
         if (xw.win != NULL)
             SDL_FillRect(xw.win, &r, SDL_MapRGB(xw.win->format, bg->r, bg->g, bg->b));
-        // draw_keyboard(xw.win);
 
-        /*#ifdef USE_ANTIALIASING
-                        if(!(text_surface=TTF_RenderUTF8_Shaded(font,s,*fg, *bg))) {
-        #else
-                        if(!(text_surface=TTF_RenderUTF8_Solid(font,s,*fg))) {
-        #endif
-                                printf("Could not TTF_RenderUTF8_Solid: %s\n", TTF_GetError());
-                                exit(EXIT_FAILURE);
-                        } else {
-                                SDL_BlitSurface(text_surface,NULL,xw.win,&r);
-                                SDL_FreeSurface(text_surface);
-                        }*/
         int xs = r.x;
         if (xw.win != NULL)
             draw_string(xw.win, s, xs, r.y, SDL_MapRGB(xw.win->format, fg->r, fg->g, fg->b));
-
-        /*while(*s) {
-            draw_char(xw.win, *s, xs, r.y, SDL_MapRGB(xw.win->format, fg->r, fg->g, fg->b));
-            xs += 6;
-            s++;
-        }*/
 
         if (base.mode & ATTR_UNDERLINE) {
             // r.y += TTF_FontAscent(font) + 1;
@@ -2276,8 +2211,7 @@ void kpress(SDL_Event *ev) {
                         (shift ? "abcd" : "ABCD")[ksym - SDLK_UP]);
                 ttywrite(buf, 3);
                 break;
-            case SDLK_INSERT:
-                break;
+            case SDLK_INSERT: break;
             case SDLK_RETURN:
                 if (meta) ttywrite("\033", 1);
 
@@ -2406,12 +2340,12 @@ void run(void) {
 
         if (ev.type == SDL_QUIT) break;
 
-        if (ev.type == SDL_JOYBUTTONDOWN || ev.type == SDL_JOYBUTTONUP || ev.type == SDL_JOYHATMOTION || ev.type == SDL_JOYAXISMOTION) {
-            if (handle_joystick_event(&ev) < 0)
-                break;
+        if (ev.type == SDL_JOYBUTTONDOWN || ev.type == SDL_JOYBUTTONUP ||
+            ev.type == SDL_JOYHATMOTION || ev.type == SDL_JOYAXISMOTION) {
+            if (handle_joystick_event(&ev) < 0) break;
             else if (handler[ev.type]) (handler[ev.type])(&ev);
         } else if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP) {
-            if (!handle_keyboard_event(&ev)) 
+            if (!handle_keyboard_event(&ev))
                 if (handler[ev.type]) (handler[ev.type])(&ev);
         } else {
             if (handler[ev.type]) (handler[ev.type])(&ev);
@@ -2423,7 +2357,7 @@ void run(void) {
             case SDL_USEREVENT: draw();
         }
         xflip();
-        //SDL_Delay(20);
+        // SDL_Delay(20);
     }
 
     SDL_KillThread(thread);
