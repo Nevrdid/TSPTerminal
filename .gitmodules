@@ -1,0 +1,3 @@
+[submodule "trimui-smart-pro-toolchain"]
+	path = trimui-smart-pro-toolchain
+	url = https://github.com/s0ckz/trimui-smart-pro-toolchain

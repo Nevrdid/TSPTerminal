@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - test-release
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Build the Docker image from the submodule
+        run: |
+          cd trimui-smart-pro-toolchain
+          mkdir -p ./workspace
+          docker build -t trimuisp .
+          touch .build
+
+      - name: Use the Docker image to build the project
+        run: |
+          docker run -it --rm -v ${{ github.workspace }}:/workspace trimuisp \
+            /bin/bash -c "cd /workspace && make"
+
+      - name: Create release archive
+        run: |
+          mkdir -p release
+          tar -czvf release/TSP_Terminal.tar.gz -C ./build/SimpleTerminal .
+
+      - name: Upload release asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: TSP_Terminal
+          path: release/TSP_Terminal.tar.gz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/TSP_Terminal.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
