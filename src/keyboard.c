@@ -302,6 +302,10 @@ int compute_new_col(int visual_offset, int old_row, int new_row)
 
 int handle_joystick_event(SDL_Event *ev)
 {
+    static Uint32 last_event_time = 0;
+    Uint32 current_time = SDL_GetTicks();
+
+
     //fprintf(stderr,"handle_joystick_evnet: type: %d, button: %d, state: %d\n",ev->type, ev->jbutton.button, ev->jbutton.state);
 	static int visual_offset = 0;
 
@@ -309,7 +313,10 @@ int handle_joystick_event(SDL_Event *ev)
     switch (ev->type) {
         case SDL_JOYBUTTONDOWN:
             switch (ev->jbutton.button) {
-                case 0: // A button (b0)
+                case 0: // B button (b0)
+			        simulate_key(SDLK_BACKSPACE, STATE_TYPED);
+                    break;
+                case 1: // A button (b1)
                     key = keys[shifted][selected_j][selected_i];
                     if (mod_state & KMOD_CTRL)
                     {
@@ -326,9 +333,6 @@ int handle_joystick_event(SDL_Event *ev)
                     {
                         simulate_key(key, STATE_TYPED);
                     }    
-                    break;
-                case 1: // B button (b1)
-			        simulate_key(SDLK_BACKSPACE, STATE_TYPED);
                     break;
                 case 2: // X button (b2)
                     active = !active;
@@ -372,7 +376,8 @@ int handle_joystick_event(SDL_Event *ev)
                 shifted = 0;
                 toggled[4][0] = 0;
                 update_modstate(SDLK_LSHIFT, STATE_UP);
-                break;
+            } else if (show_help) {
+                show_help = 0;
             }
             break;
 
@@ -422,14 +427,30 @@ int handle_joystick_event(SDL_Event *ev)
             break;
 
         case SDL_JOYAXISMOTION:
-            if (ev->jaxis.axis == 2) { // L2 (Left Trigger)
-                if (ev->jaxis.value > 32767 / 2) { // Adjust threshold if needed
-				    simulate_key(KEY_ARROW_LEFT, STATE_TYPED);
-                }
-            } else if (ev->jaxis.axis == 5) { // R2 (Right Trigger)
-                if (ev->jaxis.value > 32767 / 2) { // Adjust threshold if needed
-				    simulate_key(KEY_ARROW_RIGHT, STATE_TYPED);
-                }
+            if (current_time - last_event_time < 100) { // 100ms threshold
+                return 0; // Ignore this event
+            }
+            last_event_time = current_time;
+            switch (ev->jaxis.axis) {
+                case 0: // Left Stick X-Axis
+                    if (ev->jaxis.value < -16000)
+                        simulate_key(SDLK_LEFT, STATE_TYPED);
+                    else if (ev->jaxis.value > 16000)
+                        simulate_key(SDLK_RIGHT, STATE_TYPED);
+                    break;
+                case 1: // Left Stick Y-Axis
+                    if (ev->jaxis.value < -16000)
+                        simulate_key(SDLK_UP, STATE_TYPED);
+                    else if (ev->jaxis.value > 16000)
+                        simulate_key(SDLK_DOWN, STATE_TYPED);
+                case 2: // Left Trigger
+                    break;
+                case 3: // Right Stick Y-Axis
+                    break;
+                case 4: // Right Stick X-Axis
+                    break;
+                case 5: // Right Trigger
+                    break;
             }
             break;
 

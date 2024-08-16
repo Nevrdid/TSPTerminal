@@ -58,7 +58,7 @@
 #define XK_NO_MOD UINT_MAX
 #define XK_ANY_MOD 0
 
-#define REDRAW_TIMEOUT (500 * 1000) /* 500 ms */
+#define REDRAW_TIMEOUT (100 * 1000) /* 200 ms */
 
 /* macros */
 #define CLEANMASK(mask) (mask & (KMOD_SHIFT | KMOD_CTRL | KMOD_ALT | KMOD_META))
@@ -2423,7 +2423,7 @@ void run(void) {
             case SDL_USEREVENT: draw();
         }
         xflip();
-        SDL_Delay(20);
+        //SDL_Delay(20);
     }
 
     SDL_KillThread(thread);
