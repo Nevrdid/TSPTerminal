@@ -6,6 +6,7 @@
 void init_keyboard();
 void draw_keyboard(SDL_Surface* surface);
 int handle_keyboard_event(SDL_Event* event);
+int handle_joystick_event(SDL_Event *event);
 extern int active;
 extern int show_help;
 

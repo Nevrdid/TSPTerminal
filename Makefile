@@ -3,12 +3,6 @@
 
 include makefiles/config.mk
 
-ifeq ($(UNION_PLATFORM),rg35xxplus)
-include makefiles/config-rg35xxplus.mk
-else ifeq ($(UNION_PLATFORM),upscale)
-include makefiles/config-generic-linux-upscale.mk
-endif
-
 SRC = $(wildcard src/*.c)
 
 all: options build
